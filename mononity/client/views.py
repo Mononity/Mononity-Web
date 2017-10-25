@@ -97,6 +97,28 @@ def stan(request):
      context = {'apikey':apikey}
      return render(request, 'stan.html', context)
 '''
+def dmakezip(apikey,appname,filearr):
+    rawname=appname+'_'+apikey+'.zip'
+    zipname=os.path.join(settings.MEDIA_ROOT, 'zipped\\'+rawname)
+    with zipfile.ZipFile(zipname, 'w') as myzip:
+        for csf in filearr:
+            file=os.path.join(settings.MEDIA_ROOT, 'tmp\\'+str(csf))
+            with open(file, 'wb') as destination:
+                for chunk in csf.chunks():
+                    destination.write(chunk)
+            myzip.write(file,basename(file))
+        myzip.close()
+        for csf in filearr:
+            file=os.path.join(settings.MEDIA_ROOT, 'tmp\\'+str(csf))
+            try:
+                os.remove(file)
+            except:
+                pass
+        return rawname
+        #donefile=open(file,'r')
+        #lines=donefile.readlines()
+        #print(lines)
+
 def makezip(apikey,appname,filearr):
     rawname=appname+'_'+apikey+'.zip'
     zipname=os.path.join(settings.MEDIA_ROOT, 'zipped\\'+rawname)
@@ -163,7 +185,9 @@ def stan(request):
             for key, value in request.FILES.items():
                 if (str(value.name).endswith('.cs')):
                     filearr.append(value)
-                    newfile = CsFile.objects.create(apikey=apikey,usr=request.user,file=value,appname=appname,regdate=datetime.datetime.now(tz),update=datetime.datetime.now(tz))
+                    #newfile = CsFile.objects.create(apikey=apikey,usr=request.user,file=value,appname=appname,regdate=datetime.datetime.now(tz),update=datetime.datetime.now(tz))
+                    newfile = CsFile.objects.create(apikey=apikey, usr=request.user, file=str(value.name), appname=appname,
+                                                    regdate=datetime.datetime.now(tz), update=datetime.datetime.now(tz))
             #instance = form.save(commit=False)
             # request.FILES contains all of the uploaded images
             # key is 'user_image1', 'user_image2', value is the image file in memory
@@ -175,10 +199,14 @@ def stan(request):
             #return HttpResponseRedirect("www.daum.net")
             return HttpResponse('x')
     else:
-        form = AppRegForm()
-        apikey=str(uuid.uuid4().hex)
-        context = {'form': form,'genkey':apikey}
-        return render(request, 'stan.html', context)
+        if request.user.is_authenticated:
+            form = AppRegForm()
+            apikey=str(uuid.uuid4().hex)
+            context = {'form': form,'genkey':apikey}
+            #return render(request, 'stan.html', context)
+            return render(request, 'stan.html', context)
+        else:
+            return HttpResponseRedirect('../login')
 
 
 def stan_appreg(request):
@@ -217,7 +245,9 @@ def stan(request):
 '''
 def apps(request):
     if request.user.is_authenticated:
-        context = {}
+        myapps = AppInfo.objects.filter(usr=request.user)
+        mycsfs = CsFile.objects.filter(usr=request.user)
+        context = {'apps':myapps,'csfs':mycsfs}
         return render(request, 'apps.html', context)
     else:
         return HttpResponseRedirect('../login')

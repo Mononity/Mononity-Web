@@ -1,9 +1,8 @@
 body {
-    font-family: 'Roboto', sans-serif;
-
+    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
     font-size: 14px;
 }
-/*font-family: "Lucida Grande", Verdana, Arial, sans-serif;*/
+
 /* PAGE STRUCTURE */
 div#header {
     position: absolute;
@@ -120,7 +119,5 @@ td, th {
     border-bottom: 1px solid #eee;
     vertical-align: top;
     padding: 5px 15px;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
 }
-
-/*    font-family: "Lucida Grande", Verdana, Arial, sans-serif;*/

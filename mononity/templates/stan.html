@@ -1,7 +1,8 @@
 {%extends "base.html" %}
 {%block title %}MONONITY에 오신것을 환영합니다{% endblock %}
 {% block head %}
-    <link href="../static/upload/css/dropzone.css" type="text/css" rel="stylesheet"/>
+    {% load static %}
+    <link href="{% static "upload/css/dropzone.css" %}" type="text/css" rel="stylesheet"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 {% endblock %}
 
@@ -9,28 +10,27 @@
     <legend align="center">Runtime Dynamic Analysis를 위해 Unity Project Folder(C# 스크립트 내장)를 올려주세요<br>아래 체크 사항들의 Profiling을 위해 올려주신 코드를 분석하여 API를 삽입해 zip으로 돌려드립니다.</legend>
 
     <div class="container">
-    <h3><div class="col-6 alert alert-danger" role="alert"><b>Major Errors:</b><br><br>
-        <div class="checkbox" id="chkdanger">
-            <label><input type="checkbox" value="danconn" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Web Connections</label>
+        <h3><div class="col-sm-6 alert alert-danger" role="alert"><b>Major Errors:</b><br><br>
+            <div class="checkbox" id="chkdanger">
+                <label><input type="checkbox" value="danconn" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Web Connections</label>
+                <br>
+                <label><input type="checkbox" value="danrio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; External Resource I/O(e.g. Blur)</label>
+                <br>
+                <label><input type="checkbox" value="danfio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; FIles I/O</label>
+                <br>
+            </div>
+        </div></h3>
+
+        <h3><div class="col-sm-6 alert alert-warning" role="alert"><b>Major Bottlenecks:</b><br><br>
+        <div class="checkbox" id="chkwarning">
+            <label><input type="checkbox" value="warnconn" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Web Connections</label>
             <br>
-            <label><input type="checkbox" value="danrio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; External Resource I/O</label>
+            <label><input type="checkbox" value="warnrio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; External Resource I/O(e.g. Blur)</label>
             <br>
-            <label><input type="checkbox" value="danfio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; FIles I/O</label>
+            <label><input type="checkbox" value="warnfio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Files I/O</label>
             <br>
         </div>
-    </div></h3>
-
-
-<h3><div class="col-6 alert alert-warning" role="alert"><b>Major Bottlenecks:</b><br><br>
-	<div class="checkbox" id="chkwarning">
-        <label><input type="checkbox" value="warnconn" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Web Connections</label>
-        <br>
-        <label><input type="checkbox" value="warnrio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; External Resource I/O</label>
-        <br>
-        <label><input type="checkbox" value="warnfio" checked="true">&nbsp; &nbsp; &nbsp; &nbsp; Files I/O</label>
-        <br>
-    </div>
-</div></h3>
+        </div></h3>
 
 <form id="newUserForm" name="newUserForm" method="post" action="appreg" enctype="multipart/form-data">
     {% csrf_token %}
@@ -43,8 +43,10 @@
                 </ul>
             </div>
         {% endif %}
-    <h3>사용할 APP 이름</h3><input id="appname" name="{{ form.appname.name }}" type="text" placeholder="영문소문자/숫자, 30자 이하" class="form-control input-md" required>
-    <h3>생성된 API 키</h3><input id="keyname" name="{{ form.apikey.name }}" type="text" value="{{ genkey }}" class="form-control input-md" required readonly>
+    <div class="container">
+        <div class="col-sm-6"><h3>사용할 APP 이름_</h3><input id="appname" name="{{ form.appname.name }}" type="text" placeholder="영문소문자/숫자, 30자 이하" class="form-control input-md" required></div>
+        <div class="col-sm-6"><h3>생성된 API 키.zip</h3><input id="keyname" name="{{ form.apikey.name }}" type="text" value="{{ genkey }}" class="form-control input-md" required readonly></div>
+    </div>
     <br>
     <!-- The div for uploading the images -->
     <div id="dropzone" class="dropzone"></div>
@@ -52,16 +54,19 @@
     <div align="center">
         <button class="btn btn-danger btn-large" onclick="window.location.reload()">초기화</button>
         <button class="btn btn-primary btn-large" id="save">① APM 처리 다운로드</button>
+        <button class="btn btn-warning btn-large" id="noupload" onclick="offline()">or 로컬 처리(업로드X)</button>
         <button id="submit" name="submit" class="btn btn-success btn-large" disabled>② MONONITY APP 등록</button>
-
     <!--button class="btn btn-success btn-large" id="appreg" onclick="location.href= 'appreg' ">② MONONITY APP 등록</button-->
     </div>
     <br>
     <!--button id='save'> MONONITY APP 등록 </button-->
 </form>
 </div>
-		<script src="../static/upload/js/dropzone.js"></script>
+		<script src="{% static "/upload/js/dropzone.js" %}"></script>
 		<script type="text/javascript">
+        function offline() {
+            $("#submit").removeAttr("disabled");
+        }
                 $(document).ready(function(){
           var list_of_files = new Array();
           Dropzone.autoDiscover = false;  //prevent dropzone to automatically discover the dropzone object in your html
@@ -116,17 +121,17 @@
                     if(request.readyState == 4 && request.status == 200) {
                         if(request.responseText=='x')
                         {
-                            alert("앱 이름 영문 or 영문+숫자 조합으로 입력하셔야합니다");
+                            alert("앱 이름 영문 or 영문+숫자 조합으로 4글자 이상 입력하셔야합니다");
                         }
                         else
                         {
-                            window.location='http://127.0.0.1:9147/media/zipped/'+request.responseText;
-                            setTimeout(function() {$.get('http://127.0.0.1:9147/dlzip/'+request.responseText); console.log('deleted!');}, 10000);  //  3초 후 함수가 실행됨
+                            redir=("http://"+String(window.location.hostname)+":"+String(window.location.port));
+                            window.location=redir+"/media/zipped/"+request.responseText;
+                            setTimeout(function() {$.get(redir+'/dlzip/'+request.responseText); console.log('deleted!');}, 10000);  //  3초 후 함수가 실행됨
                             $("#submit").removeAttr("disabled");
-
                         }
                     }
-                }
+                };
                 request.send(formData);  //send the post request to server
             });
         });

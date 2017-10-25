@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^recl/', recl,name='recl'),
     url(r'^ress/', ress,name='ress'),
     url(r'^dlzip/(?P<zipname>.*)$', deletezip,name='dlzip'),
+    url(r'^thingplug/sub', loradust),
 ]
 urlpatterns += static(mysite.settings.MEDIA_URL, document_root=mysite.settings.MEDIA_ROOT)
 urlpatterns += static(mysite.settings.STATIC_URL, document_root=mysite.settings.STATIC_ROOT)

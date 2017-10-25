@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'bootstrap_themes',
     'client',
 
+
 )
 
 MIDDLEWARE_CLASSES = (

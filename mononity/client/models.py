@@ -47,7 +47,8 @@ class CsFile(models.Model):
     usr=models.ForeignKey(settings.AUTH_USER_MODEL ,blank = True, null = True)
     appname=models.CharField(u'앱이름', max_length=100,default='null')
     apikey = models.CharField(u'APIkey', max_length=32, default='null')
-    file = models.FileField(upload_to='files/%Y%m%d/')
+    #file = models.FileField(upload_to='files/%Y%m%d/')
+    file = models.CharField(u'파일이름', max_length=100,default='null')
     regdate = models.DateTimeField(u'등록일시', default=datetime.date.today)  # 최종업데이트 날짜
     update = models.DateTimeField(u'갱신일시', default=datetime.date.today)  # 최종업데이트 날짜
     logcnt=models.IntegerField(u'등록로그수',default=0)
