@@ -103,7 +103,7 @@ import os
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'appsql',
         'USER': 'root',
         'PASSWORD': '0000',
@@ -117,7 +117,7 @@ if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': '/cloudsql/gangwon-1:gangwon0',
+            'HOST': '/cloudsql/gangwon-1:gangwon0',p
             'NAME': 'yjms',
             'USER': 'root',
             'PASSWORD': '1234',

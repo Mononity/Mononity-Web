@@ -26,6 +26,12 @@ import os
 from io import BytesIO
 from os.path import basename
 import pygeoip
+import pymongo
+import sys
+from pymongo import mongo_client
+nosql = mongo_client('localhost:27017')
+db = nosql.AppData
+
 
 tz=pytz.timezone('Asia/Seoul')
 gi = pygeoip.GeoIP('GeoIP.dat')
@@ -72,6 +78,17 @@ def loradust(request):
             print("we have no IP address for user")
         addr=gi.country_name_by_addr(str(ip))
         newfile = logexample.objects.create(data=str(jsoned), ip=ip, country=addr, regdate=datetime.datetime.now(tz))
+        try:
+            db.AppLog.insert_one(
+                {
+                    "ip": ip,
+                    "data": str(jsoned),
+                    "regdate": datetime.datetime.now(tz),
+                    "country": addr
+                })
+        except:
+            print(sys.exc_info()[0])
+
         '''
         container = (str(xml).split('<con>')[1].split('</con>')[0])
         arr = container.split('a')
