@@ -1,0 +1,557 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Dashboard 2 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row top_tiles">
+        <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <div class="tile-stats">
+            <div class="icon"><i class="fa fa-bolt"></i></div>
+            <div class="count" id="crash"></div>
+            <h3>Crash</h3>
+            <p>Accumulated Crashes</p>
+          </div>
+        </div>
+        <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <div class="tile-stats">
+            <div class="icon"><i class="fa fa-eye"></i></div>
+            <div class="count" id="fps"></div>
+            <h3>GPU</h3>
+            <p>Average GPU Use</p>
+          </div>
+        </div>
+        <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <div class="tile-stats">
+            <div class="icon"><i class="fa fa-tasks"></i></div>
+            <div class="count" id="mem"></div>
+            <h3>Memory</h3>
+            <p>Average Memory Use</p>
+          </div>
+        </div>
+        <div class="animated flipInY col-lg-3 col-md-3 col-sm-6 col-xs-12">
+          <div class="tile-stats">
+            <div class="icon"><i class="fa fa-cogs"></i></div>
+            <div class="count" id="cpu"></div>
+            <h3>CPU</h3>
+            <p>Average CPU Use</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Unity-Visual Performance<small>by Frame/Second</small></h2>
+              <div class="filter">
+                <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                  <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="col-md-9 col-sm-12 col-xs-12">
+                <div class="demo-container" style="height:280px">
+                  <div id="chart_plot_02" class="demo-placeholder"></div>
+                </div>
+                <div class="tiles">
+                  <div class="col-md-4 tile">
+                    <span>Time Average CPU</span>
+                    <h2 id="cpup"></h2>
+                    <span class="sparkline11 graph" style="height: 160px;">
+                         <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                  <div class="col-md-4 tile">
+                    <span>Time Average GPU</span>
+                    <h2 id="gpup"></h2>
+                    <span class="sparkline22 graph" style="height: 160px;">
+                          <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                  <div class="col-md-4 tile">
+                    <span>Time Average Memory</span>
+                    <h2 id="memp"></h2>
+                    <span class="sparkline11 graph" style="height: 160px;">
+                           <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="col-md-3 col-sm-12 col-xs-12">
+                <div>
+                  <div class="x_title">
+                    <h2>Top Crashes per Scene</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li><a href="#">Settings 1</a>
+                          </li>
+                          <li><a href="#">Settings 2</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <ul class="list-unstyled top_profiles scroll-view">
+                    <li class="media event">
+                      <a class="pull-left border-aero profile_thumb">
+                        <i class="fa fa-user aero"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#" id="s1"></a>
+                        <p>Class: <strong id="c1"> </strong> </p>
+                        <p> <small id="f1"></small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-green profile_thumb">
+                        <i class="fa fa-user green"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#" id="s2"></a>
+                        <p>Class: <strong id="c2"> </strong> </p>
+                        <p> <small id="f2"></small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-blue profile_thumb">
+                        <i class="fa fa-user blue"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#" id="s3"></a>
+                        <p>Class: <strong id="c3"> </strong> </p>
+                        <p> <small id="f3"></small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-aero profile_thumb">
+                        <i class="fa fa-user aero"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#" id="s4"></a>
+                        <p>Class: <strong id="c4"> </strong> </p>
+                        <p> <small id="f4"></small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-green profile_thumb">
+                        <i class="fa fa-user green"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#" id="s5"></a>
+                        <p>Class: <strong id="c5"> </strong> </p>
+                        <p> <small id="f5"></small>
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Stacked Summary <small>Device Fragmentations</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Settings 1</a>
+                    </li>
+                    <li><a href="#">Settings 2</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+              <div class="row" style="border-bottom: 1px solid #E0E0E0; padding-bottom: 5px; margin-bottom: 5px;">
+                <div class="col-md-7" style="overflow:hidden;">
+                  <span class="sparkline_one" style="height: 160px; padding: 10px 25px;">
+                                <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                            </span>
+                  <h4 style="margin:18px">Model Based Stacked Analysis</h4>
+                </div>
+
+                <div class="col-md-5">
+                  <div class="row" style="text-align: center;">
+                    <div class="col-md-4">
+                      <canvas class="canvasDoughnutv" height="110" width="110" style="margin: 5px 10px 10px 0"></canvas>
+                      <h4 style="margin:0">Unity-App Version</h4>
+                    </div>
+                    <div class="col-md-4">
+                      <canvas class="canvasDoughnuta" height="110" width="110" style="margin: 5px 10px 10px 0"></canvas>
+                      <h4 style="margin:0">Android OS Version</h4>
+                    </div>
+                    <div class="col-md-4">
+                      <canvas class="canvasDoughnutl" height="110" width="110" style="margin: 5px 10px 10px 0"></canvas>
+                      <h4 style="margin:0">Device Location</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>CPU Issues <small>bottlenecks</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Settings 1</a>
+                    </li>
+                    <li><a href="#">Settings 2</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item One Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Three Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>GPU Issues <small>bottlenecks</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Settings 1</a>
+                    </li>
+                    <li><a href="#">Settings 2</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item One Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Three Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Memory Issues <small>bottleneck</small></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Settings 1</a>
+                    </li>
+                    <li><a href="#">Settings 2</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item One Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Two Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+              <article class="media event">
+                <a class="pull-left date">
+                  <p class="month" name="mt"></p>
+                  <p class="day" name="dt"></p>
+                </a>
+                <div class="media-body">
+                  <a class="title" name="stitle" href="#">Item Three Title</a>
+                  <p name="tdesc"></p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <!-- Chart.js -->
+  <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+  <!-- gauge.js -->
+  <script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
+  <!-- Skycons -->
+  <script src="/static/vendors/skycons/skycons.js"></script>
+  <!-- Flot -->
+  <script src="/static/vendors/Flot/jquery.flot.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.time.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
+  <!-- Flot plugins -->
+  <script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+  <script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+  <script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
+  <!-- DateJS -->
+  <script src="/static/vendors/DateJS/build/date.js"></script>
+  <!-- JQVMap -->
+  <script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+  <script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+  <script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <script src="/static/build/js/custom.js"></script>
+    <script>
+        var mar=retrhund(4);
+        for (var e in mar)
+        {
+            if(mar[e]<40)
+            {
+                mar[e]+=40;
+            }
+        }
+        document.getElementById("cpu").innerHTML = mar[0]+"%";
+        document.getElementById("fps").innerHTML = mar[1]+"%";
+        document.getElementById("mem").innerHTML = mar[2]+"%";
+        document.getElementById("crash").innerHTML = mar[3];
+        var marr=retrhund(4);
+        for (var e in marr)
+        {
+            if(marr[e]<40)
+            {
+                marr[e]+=40;
+            }
+        }
+        document.getElementById("cpup").innerHTML = marr[0]+"%";
+        document.getElementById("gpup").innerHTML = marr[1]+"%";
+        document.getElementById("memp").innerHTML = marr[2]+"%";
+        for(var i=1;i<6;i++)
+        {
+            var info=retrsc();
+
+
+
+            document.getElementById('s'+String(i)).innerText=String(info).split(':')[1].split('-')[0];
+            document.getElementById('c'+String(i)).innerText=String(info).split(':')[1].split('-')[1];
+            document.getElementById('f'+String(i)).innerText=String(info).split(':')[1].split('-')[2];
+        }
+          function gmon() {
+              var gm=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"];
+              return gm[parseInt(Math.random()*100)%12];
+          }
+          
+          $(function () {
+        var elems=document.getElementsByName("mt");
+        var ttelems=document.getElementsByName("stitle");
+        var telems=document.getElementsByName("dt");
+        var tdesc=document.getElementsByName("tdesc");
+        for (var i=0;i<elems.length;i++){
+            elems[i].innerHTML=gmon();
+        }
+        for (var i=0;i<telems.length;i++){
+            var tar=retrhund(5);
+            if(tar[0]>30)
+            {
+                tar[0]=(tar[0]%30)+1;
+            }
+            telems[i].innerHTML=tar[0];
+        }
+        for (var i=0;i<ttelems.length;i++){
+            var info=retrsc();
+            ttelems[i].innerHTML=String(info).split(':')[1].split('-')[0];
+            tdesc[i].innerHTML=String(info).split(':')[1].split('-')[1];
+
+        }
+       });
+
+    </script>
+{% endblock javascripts %}

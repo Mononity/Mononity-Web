@@ -1,0 +1,856 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Dashboard 1 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+<script src="/static/build/js/custom.js"></script>
+{% block content %}
+  <div class="right_col" role="main">
+    <!-- top tiles -->
+    <div class="row tile_count">
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="Users" onclick="plotchange(this.id)">
+        <span class="count_top"><i class="fa fa-user"></i> Total Users</span>
+        <div class="count dark" id="userm">2587</div>
+        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>4% </i> From last Week</span>
+      </div>
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="Crashes" onclick="plotchange(this.id)">
+        <span class="count_top"><i class="fa fa-bolt"></i> Unchecked Crashes</span>
+        <div class="count red" id="crashm">143</div>
+        <span class="count_bottom"><i class="red"><i class="fa fa-sort-asc"></i>13% </i> From last Week</span>
+      </div>
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="FPS" onclick="plotchange('Frame/Sec')">
+        <span class="count_top"><i class="fa fa-user"></i> Frame per Second</span>
+        <div class="count green" id="fpsm">67</div>
+        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>24% </i> From last Week</span>
+      </div>
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="CPU" onclick="plotchange(this.id)">
+        <span class="count_top"><i class="fa fa-user"></i> CPU Usage</span>
+        <div class="count blue" id="cpum">52%</div>
+        <span class="count_bottom"><i class="green"><i class="fa fa-sort-desc"></i>5% </i> From last Week</span>
+      </div>
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="Memory" onclick="plotchange(this.id)">
+        <span class="count_top"><i class="fa fa-user"></i> Memory Usage</span>
+        <div class="count purple" id="memm">75%</div>
+        <span class="count_bottom"><i class="red"><i class="fa fa-sort-asc"></i>8% </i> From last Week</span>
+      </div>
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count" id="Models" onclick="plotchange(this.id)">
+        <span class="count_top"><i class="fa fa-user"></i> Device Models</span>
+        <div class="count" id="modelm">272</div>
+        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>34% </i> From last Week</span>
+      </div>
+    </div>
+    <!-- /top tiles -->
+
+    <div class="row">
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="dashboard_graph">
+
+          <div class="row x_title">
+            <div class="col-md-3 pull-left" id="subplottitle">
+              <h3>Users Metric per Scene  <small>↓click grid</small></h3>
+            </div>
+            <div class="col-md-3 pull-left" id="plotctrl" align="left">
+              <button class="btn" id="cpu-prevbtn"><i class="fa fa-backward"></i></button>
+                <button class="btn" id="cpu-getnow"><i class="fa fa-repeat"></i></button>
+                <button class="btn" id="cpu-nextbtn"><i class="fa fa-forward"></i></button>
+            </div>
+
+            <div class="col-md-6">
+                <div id="pickrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                 <select class="selectpicker" id="cpu-trange" name="trange">
+                      <option value="day">1 Day</option>
+                      <option value="week">1 Week</option>
+                      <option value="month">1 Month</option>
+                      <option value="year">1 Year</option>
+                </select>
+              </div>
+              <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+              </div>
+              <div id="legendrange1" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px;">
+                <p><i class="fa fa-square green"></i> Average </p>
+              </div>
+              <div id="legendrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px;">
+                  <p><i class="fa fa-square dark"></i><b> Clicked Grid in Heatmap</b> </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 col-sm-4 col-xs-12">
+              <div class="row">
+                <div id="cpu"></div>
+              </div>
+              <div class="row" id="mbcontainer">
+                  <canvas id="mybarChart" height="100px" style="width: 100%;height:100px;"></canvas>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 bg-white" id="radcontainer">
+              <canvas id="canvasRadar"  style="height:100%;"></canvas>
+{#              <div id="chart_plot_01" data-stuff='["a","b","c"]' class="demo-placeholder"></div>#}
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 bg-white" id="lococontainer">
+              <div id="loco"></div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320">
+          <div class="x_title">
+            <h2>Unity-App Versions<small> User's Device Installed Version</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Settings 1</a>
+                  </li>
+                  <li><a href="#">Settings 2</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <h4>App Version Fragmentations</h4>
+            <div class="widget_summary">
+              <div class="w_left w_25">
+                <span>0.1.5</span>
+              </div>
+              <div class="w_center w_55">
+                <div class="progress">
+                  <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 66%;">
+                    <span class="sr-only">60% Complete</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w_right w_20">
+                <span>143k</span>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="widget_summary">
+              <div class="w_left w_25">
+                <span>0.1.6</span>
+              </div>
+              <div class="w_center w_55">
+                <div class="progress">
+                  <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 45%;">
+                    <span class="sr-only">60% Complete</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w_right w_20">
+                <span>53k</span>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="widget_summary">
+              <div class="w_left w_25">
+                <span>0.1.7</span>
+              </div>
+              <div class="w_center w_55">
+                <div class="progress">
+                  <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 25%;">
+                    <span class="sr-only">60% Complete</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w_right w_20">
+                <span>33k</span>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="widget_summary">
+              <div class="w_left w_25">
+                <span>0.1.8</span>
+              </div>
+              <div class="w_center w_55">
+                <div class="progress">
+                  <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 7%;">
+                    <span class="sr-only">60% Complete</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w_right w_20">
+                <span>13k</span>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="widget_summary">
+              <div class="w_left w_25">
+                <span>0.1.9</span>
+              </div>
+              <div class="w_center w_55">
+                <div class="progress">
+                  <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 3%;">
+                    <span class="sr-only">60% Complete</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w_right w_20">
+                <span>6k</span>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320 overflow_hidden">
+          <div class="x_title">
+            <h2>Android OS Fragmentations<small> User Android Ver. TopDown</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Settings 1</a>
+                  </li>
+                  <li><a href="#">Settings 2</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <table class="" style="width:100%">
+              <tr>
+                <th style="width:37%;">
+                  <p>Top 5</p>
+                </th>
+                <th>
+                  <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                    <p class="">Device</p>
+                  </div>
+                  <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                    <p class="">Progress</p>
+                  </div>
+                </th>
+              </tr>
+              <tr>
+                <td>
+{#                  <canvas class="canvasDoughnut" height="140" width="140" style="margin: 15px 10px 10px 0"></canvas>#}
+                    <div id="graph_donut" style="width:100%; height:150px;"></div>
+                </td>
+                <td>
+                  <table class="tile_info">
+                    <tr>
+                      <td>
+                        <p><i class="fa fa-square blue"></i>Marshmallow </p>
+                      </td>
+                      <td>33%</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><i class="fa fa-square red"></i>Nougat </p>
+                      </td>
+                      <td>22%</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><i class="fa fa-square purple"></i>Lollipop </p>
+                      </td>
+                      <td>21%</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><i class="fa fa-square aero"></i>Kitkat </p>
+                      </td>
+                      <td>13%</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p><i class="fa fa-square green"></i>Oreo </p>
+                      </td>
+                      <td>11%</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320 overflow_hidden">
+         <div class="x_title">
+              <h2>Worst Scene Performances<small>Overall FPS+CPU+MEM</small></h2>
+             <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Settings 1</a>
+                  </li>
+                  <li><a href="#">Settings 2</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+              </li>
+            </ul>
+              <div class="clearfix"></div>
+            </div>
+            <style>
+            .progress_sm .progress-bar {
+              position: relative;
+              float: right;
+            }
+            </style>
+            <div class="col-md-12 col-sm-12 col-xs-6">
+              <div>
+                  <p>Scene1 <span id="s1mod"> ( ↓click proportion for model )</span></p>
+                  <div class="">
+                  <div class="progress progress_sm" >
+                    <div class="progress-bar progress-bar-danger progress-bar-striped active" title="s1" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="11"
+                    aria-valuemin="0" aria-valuemax="100" style="width:11%">
+                    11%
+                    </div>
+                    <div class="progress-bar progress-bar-warning progress-bar-striped active" title="s1" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="24"
+                    aria-valuemin="0" aria-valuemax="100" style="width:24%">
+                    24%
+                    </div>
+                    <div class="progress-bar progress-bar-info progress-bar-striped active" title="s1" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="27"
+                    aria-valuemin="0" aria-valuemax="100" style="width:27%">
+                    27%
+                    </div>
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" title="s1" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="33"
+                    aria-valuemin="0" aria-valuemax="100" style="width:33%">
+                    33%
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p>Scene2 <span id="s2mod"> ( ↓click proportion for model )</span></p>
+                <div class="">
+                  <div class="progress progress_sm" >
+{#                    <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="99"></div>#}
+                        <div class="progress-bar progress-bar-danger progress-bar-striped active" title="s2" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="18"
+                        aria-valuemin="0" aria-valuemax="100" style="width:18%">
+                        18%
+                        </div>
+                        <div class="progress-bar progress-bar-warning progress-bar-striped active" title="s2" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="22"
+                        aria-valuemin="0" aria-valuemax="100" style="width:22%">
+                        22%
+                        </div>
+                        <div class="progress-bar progress-bar-info progress-bar-striped active" title="s2" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="25"
+                        aria-valuemin="0" aria-valuemax="100" style="width:25%">
+                        25%
+                        </div>
+                        <div class="progress-bar progress-bar-success progress-bar-striped active" title="s2" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="28"
+                        aria-valuemin="0" aria-valuemax="100" style="width:28%">
+                        28%
+                        </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-6">
+              <div>
+                <p>Scene3 <span id="s3mod"> ( ↓click proportion for model )</span></p>
+                <div class="">
+                  <div class="progress progress_sm" >
+                    <div class="progress-bar progress-bar-danger progress-bar-striped active" title="s3" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="9"
+                    aria-valuemin="0" aria-valuemax="100" style="width:9%">
+                    9%
+                    </div>
+                    <div class="progress-bar progress-bar-warning progress-bar-striped active" title="s3" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="11"
+                    aria-valuemin="0" aria-valuemax="100" style="width:11%">
+                    11%
+                    </div>
+                    <div class="progress-bar progress-bar-info progress-bar-striped active" title="s3" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="17"
+                    aria-valuemin="0" aria-valuemax="100" style="width:17%">
+                    17%
+                    </div>
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" title="s3" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="42"
+                    aria-valuemin="0" aria-valuemax="100" style="width:42%">
+                    42%
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p>Scene4 <span id="s4mod"> ( ↓click proportion for model )</span></p>
+                <div class="">
+                  <div class="progress progress_sm" >
+                    <div class="progress-bar progress-bar-danger progress-bar-striped active" title="s4" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="7"
+                    aria-valuemin="0" aria-valuemax="100" style="width:7%">
+                    7%
+                    </div>
+                    <div class="progress-bar progress-bar-warning progress-bar-striped active" title="s4" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="14"
+                    aria-valuemin="0" aria-valuemax="100" style="width:14%">
+                    14%
+                    </div>
+                    <div class="progress-bar progress-bar-info progress-bar-striped active" title="s4" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="19"
+                    aria-valuemin="0" aria-valuemax="100" style="width:19%">
+                    19%
+                    </div>
+                    <div class="progress-bar progress-bar-success progress-bar-striped active" title="s4" onclick="modelbarclick(this.title,this.innerHTML)" role="progressbar" aria-valuenow="26"
+                    aria-valuemin="0" aria-valuemax="100" style="width:26%">
+                    26%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Recent Crashes <small>Scene-Class-subFunction Timeline</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Settings 1</a>
+                  </li>
+                  <li><a href="#">Settings 2</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="dashboard-widget-content">
+              <ul class="list-unstyled timeline widget">
+                <li>
+                  <div class="block">
+                    <div class="block_content">
+                      <h2 class="title">
+                                        <a>Airplane - Scene2</a>
+                                    </h2>
+                      <div class="byline">
+                        <span>13 hours ago</span> by <a>OCYXS5K..</a>
+                      </div>
+                      <p class="excerpt">UnluckPSBird - FlapAway()… <a>Read&nbsp;More</a>
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="block_content">
+                      <h2 class="title">
+                                        <a>Airplane - Scene3</a>
+                                    </h2>
+                      <div class="byline">
+                        <span>13 hours ago</span> by <a>OCYXS5K..</a>
+                      </div>
+                      <p class="excerpt">UnluckPSPickup-PickMeUp()… <a>Read&nbsp;More</a>
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="block_content">
+                      <h2 class="title">
+                                        <a>Airplane - Scene1</a>
+                                    </h2>
+                      <div class="byline">
+                        <span>13 hours ago</span> by <a>OCYXS5K..</a>
+                      </div>
+                      <p class="excerpt">UnluckPSGhost-EmitSmoke… <a>Read&nbsp;More</a>
+                      </p>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="block">
+                    <div class="block_content">
+                      <h2 class="title">
+                                        <a>Airplane - Scene3</a>
+                                    </h2>
+                      <div class="byline">
+                        <span>13 hours ago</span> by <a>OCYXS5K..</a>
+                      </div>
+                      <p class="excerpt">UnluckPSGhost - Playbach… <a>Read&nbsp;More</a>
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8 col-sm-8 col-xs-12">
+
+        <div class="row">
+
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2>Users Locations Cluster <small>Geo-presentation with IP classification</small></h2>
+                <ul class="nav navbar-right panel_toolbox">
+                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#">Settings 1</a>
+                      </li>
+                      <li><a href="#">Settings 2</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                  </li>
+                </ul>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="dashboard-widget-content">
+                  <div class="col-md-4 custom-dextro">
+                    <h2 class="line_30">125.7k Views from 60 countries</h2>
+
+                    <table class="countries_list">
+                      <tbody>
+                        <tr>
+                          <td>United States</td>
+                          <td class="fs15 fw700 text-right">33%</td>
+                        </tr>
+                        <tr>
+                          <td>China</td>
+                          <td class="fs15 fw700 text-right">27%</td>
+                        </tr>
+                        <tr>
+                          <td>Europe</td>
+                          <td class="fs15 fw700 text-right">19%</td>
+                        </tr>
+                        <tr>
+                          <td>India</td>
+                          <td class="fs15 fw700 text-right">11%</td>
+                        </tr>
+                        <tr>
+                          <td>South America</td>
+                          <td class="fs15 fw700 text-right">10%</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="world-map-gdp" class="col-md-8 col-sm-12 col-xs-12" style="height:230px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="row">
+
+
+          <!-- Start to do list -->
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2>Solutions In Need <small>Check Solved for Solution Machine Learning</small></h2>
+                <ul class="nav navbar-right panel_toolbox">
+                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#">Settings 1</a>
+                      </li>
+                      <li><a href="#">Settings 2</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                  </li>
+                </ul>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <script>
+                    function vivi() {
+                        console.log("ew");
+                    }
+                </script>
+                <div class="" id="boxes">
+                  <ul class="to_do">
+                    <li>
+                      <p>
+                        <input id="td1" type="checkbox" class="flat"><span name="scact"></span></p>
+
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td2" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td3" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td4" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td5" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td6" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td7" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td8" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                    <li>
+                      <p>
+                        <input id="td9" type="checkbox" class="flat"><span name="scact"></span></p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End to do list -->
+
+          <!-- start of weather widget -->
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="x_panel">
+              <div class="x_title">
+                <a href="crash_gallery.html"><h2>Crash Gallery <small>User Authorized Recent Crash Screenshot</small></h2></a>
+                <ul class="nav navbar-right panel_toolbox">
+                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#">Settings 1</a>
+                      </li>
+                      <li><a href="#">Settings 2</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><a class="refresh-link"><i class="fa fa-repeat"></i></a>
+                  </li>
+                </ul>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content" id="cgr">
+
+                      <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                            <!-- Indicators -->
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner">
+                             <div class="item active">
+                                <img src="/static/images/airplane/{{ cgs.0}}" alt="Los Angeles" style="width:100%;">
+                                  <div class="carousel-caption d-none d-md-block">
+                                    <h3 name="scact"></h3>
+                                    <p name="timestamp"></p>
+                                  </div>
+                              </div>
+                                {% for cgg in cgs %}
+                                  <div class="item">
+                                    <img src="/static/images/airplane/{{ cgg }}" alt="Chicago" style="width:100%;">
+                                      <div class="carousel-caption d-none d-md-block">
+                                        <h3 name="scact"></h3>
+                                        <p name="timestamp"></p>
+                                      </div>
+                                  </div>
+                                {% endfor %}
+
+
+{##}
+{#                              <div class="item">#}
+{#                                <img src="/static/images/media1.jpg" alt="New york" style="width:100%;">#}
+{#                                  <div class="carousel-caption d-none d-md-block">#}
+{#                                    <h3>...</h3>#}
+{#                                    <p>...</p>#}
+{#                                  </div>#}
+{#                              </div>#}
+                            </div>
+
+                            <!-- Left and right controls -->
+                            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                              <span class="glyphicon glyphicon-chevron-left"></span>
+                              <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                              <span class="glyphicon glyphicon-chevron-right"></span>
+                              <span class="sr-only">Next</span>
+                            </a>
+                          </div>
+                  {#<div class="thumbnail">#}
+{#                    <div class="image view view-first">#}
+{#                      <img class="rcg" style="width: 100%; display: block;" src="/static/images/media1.jpg" alt="image">#}
+{#                      <div class="mask no-caption">#}
+{#                        <div class="tools tools-bottom">#}
+{#                          <a href="#"><i class="fa fa-link"></i></a>#}
+{#                          <a href="#"><i class="fa fa-pencil"></i></a>#}
+{#                          <a href="#"><i class="fa fa-times"></i></a>#}
+{#                        </div>#}
+{#                      </div>#}
+{#                    </div>#}
+{#                    <div class="caption" id="capt">#}
+{#                      <p><strong>Fri Dec 08 2017 12:11:12 GMT+0900</strong>#}
+{#                      </p>#}
+{#                      <p>Samsung SM-J120A: Scene4 - UnluckPSPickup - EmitSmoke</p>#}
+{#                    </div>#}
+{#                    </div>#}
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- end of weather widget -->
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <!-- Chart.js -->
+  <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+  <!-- gauge.js -->
+  <script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
+  <!-- Skycons -->
+  <script src="/static/vendors/skycons/skycons.js"></script>
+  <!-- Flot -->
+  <script src="/static/vendors/Flot/jquery.flot.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.time.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
+  <script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
+  <!-- Flot plugins -->
+  <script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+  <script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+  <script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
+  <!-- DateJS -->
+  <script src="/static/vendors/DateJS/build/date.js"></script>
+  <!-- JQVMap -->
+  <script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+  <script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+  <script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+  <!-- D3v3-->
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <!-- D3v3net-->
+    <script src="/static/build/js/d3net.js"></script>
+  <!-- cal-heatmap-->
+    <script type="text/javascript" src="static/cal-heatmap/js/cal-heatmap.min.js?v=3.5.1"></script>
+	<script type="text/javascript" src="static/cal-heatmap/js/moment.min.js"></script>
+	<script type="text/javascript" src="static/cal-heatmap/js/lang.min.js"></script>
+
+    <script src="/static/cal-heatmap/js/calcus.js"></script>
+  <!-- Das Ist Custom-->
+    <script type="text/javascript">
+    function plotchange(id) {
+        document.getElementById("subplottitle").innerHTML = "<h3>"+id+" Metric per Scene  <small>↓click grid</small></h3>";
+    }
+    function numberCounter(target_frame, target_number) {
+        //console.log("target_frame : "+target_frame);
+        //console.log("target_number : "+target_number);
+        this.count = 0; this.diff = 0;
+        //this.target_count = parseInt(target_number);
+        this.target_frame = document.getElementById(target_frame);
+        this.target_count=parseInt(this.target_frame.innerHTML);
+        this.timer = null;
+
+        this.counter= function() {
+            var self = this;
+            this.diff = this.target_count - this.count;
+            //console.log(this.target_count);
+            //console.log(this.count);
+            if(this.diff > 0) {
+                self.count += Math.ceil(this.diff /5);
+            }
+
+            this.target_frame.innerHTML = this.count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            if(this.count < this.target_count) {
+                this.timer = setTimeout(function() { self.counter(); }, 100);
+            } else {
+                clearTimeout(this.timer);
+                if(target_frame =="memm"||target_frame=="cpum")
+                {
+                this.target_frame.innerHTML =String(this.target_frame.innerHTML)+"%";
+                }
+            }
+            };
+        this.counter();
+    };
+    new numberCounter("userm", 3957);
+    new numberCounter("crashm", 3957);
+    new numberCounter("fpsm", 3957);
+    new numberCounter("cpum", 3957);
+    new numberCounter("memm", 3957);
+    new numberCounter("modelm", 3957);
+    grmapper();
+
+    // Initialize tooltip component
+    $(function () {
+        var elems=document.getElementsByName("scact");
+        var telems=document.getElementsByName("timestamp");
+        for (var i=0;i<elems.length;i++){
+            elems[i].innerHTML=retrsc();
+        }
+        for (var i=0;i<telems.length;i++){
+            telems[i].innerHTML=decade();
+
+        }
+       });
+
+    function modelbarclick(v,p) {
+        var inneed=v+"mod";
+        document.getElementById(inneed).innerHTML = " ( "+retrphone()+" :"+p+")";
+    }
+    $('input').on('ifChecked', function(event){
+        var obj=$(this).parent().parent();
+        var footer=String(obj.children()[1].innerText);
+{#        console.log(obj.children()[1].innerText);#}
+        $.get('../ml/'+footer);
+        var delobj=$(this).parent().parent().parent();
+         setTimeout(function() {
+      delobj.remove();
+   }, 1000);
+});
+    $('.carousel').carousel({
+      interval: 1000
+    })
+</script>
+{% endblock javascripts %}
